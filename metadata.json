@@ -1,0 +1,5 @@
+{
+  "name": "AI-Powered E-commerce Store",
+  "description": "A modern e-commerce storefront showcasing products with AI-powered features, including a product description generator and a product-specific Q&A chatbot, all powered by the Gemini API.",
+  "requestFramePermissions": []
+}
