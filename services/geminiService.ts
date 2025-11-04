@@ -1,9 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 import { Product } from '../types';
 
-// Initialize the AI client. It's okay if API_KEY is undefined initially;
-// we will check for it before each API call to provide a better demo experience.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let ai: GoogleGenAI | undefined;
+
+function getAiClient(): GoogleGenAI {
+  // If the client is already initialized, return it.
+  if (ai) {
+    return ai;
+  }
+  // If the API key is not available, throw an error.
+  // This function should only be called when we are sure the key exists.
+  if (!process.env.API_KEY) {
+    throw new Error("Attempted to initialize AI client without an API key.");
+  }
+  // Initialize and store the client instance.
+  ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return ai;
+}
 
 export async function generateDescription(productName: string, keywords: string[]): Promise<string> {
   if (!process.env.API_KEY) {
@@ -16,7 +29,8 @@ export async function generateDescription(productName: string, keywords: string[
   const prompt = `Generate a captivating and professional e-commerce product description for a product named '${productName}'. Highlight these features or keywords: ${keywords.join(', ')}. The description should be around 50-70 words, be persuasive for online shoppers, and avoid any introductory phrases like "Introducing..." or "Here is...". Just provide the description text directly.`;
   
   try {
-    const response = await ai.models.generateContent({
+    const aiClient = getAiClient();
+    const response = await aiClient.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
     });
@@ -46,7 +60,8 @@ Keywords/Tags: ${product.keywords.join(', ')}
 User's Question: ${question}`;
 
   try {
-    const response = await ai.models.generateContent({
+    const aiClient = getAiClient();
+    const response = await aiClient.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
     });
